@@ -1,6 +1,6 @@
 // Sample enrollee data structure
 const enrollees = [];
-
+let currentEditIndex = -1;
 // Function to add a new enrollee
 function addEnrollee() {
     const firstName = document.getElementById("firstName").value;
@@ -30,7 +30,7 @@ function addEnrollee() {
 // Function to display enrollees in the table
 function displayEnrollees() {
     const tableBody = document.querySelector("#enrollee-table tbody");
-    tableBody.innerHTML = "";
+    tableBody.innerHTML = ""; // Clear existing table rows
 
     const searchInput = document.getElementById("searchInput");
     const searchQuery = searchInput.value.toLowerCase(); // Convert search query to lowercase for case-insensitive search
@@ -70,8 +70,9 @@ searchInput.addEventListener("input", displayEnrollees);
 // Initial display of enrollees
 displayEnrollees();
 
+
 // Function to edit an enrollee
-function editEnrollee(enrollee) {
+function editEnrollee(enrollee, editButtonId) {
     const firstNameInput = document.getElementById("firstName");
     const middleNameInput = document.getElementById("middleName");
     const lastNameInput = document.getElementById("lastName");
@@ -95,42 +96,53 @@ function editEnrollee(enrollee) {
         courseInput.value = enrollee.course;
         schoolYearInput.value = enrollee.schoolYear;
 
-        // Replace the "Add" button with an "Update" button for this enrollee
-        const addButton = document.querySelector(".submit-btn");
-        addButton.textContent = "Update";
-        addButton.removeEventListener("click", addEnrollee); // Remove the old addEnrollee event listener
-        addButton.addEventListener("click", () => updateEnrollee(index)); // Add a new event listener for updating
+        // Store the current edit index for future reference
+        currentEditIndex = index;
+
+        // Replace the "Submit" button with an "Update" button
+        const submitButton = document.querySelector(".submit-btn");
+        submitButton.textContent = "Update";
+        submitButton.removeEventListener("click", addEnrollee);
+        submitButton.addEventListener("click", updateEnrollee);
     }
 }
 
 // Function to update an enrollee
-function updateEnrollee(index) {
-    const firstNameInput = document.getElementById("firstName").value;
-    const middleNameInput = document.getElementById("middleName").value;
-    const lastNameInput = document.getElementById("lastName").value;
-    const ageInput = document.getElementById("age").value;
-    const genderInput = document.getElementById("gender").value;
-    const birthdayInput = document.getElementById("birthday").value;
-    const courseInput = document.getElementById("course").value;
-    const schoolYearInput = document.getElementById("schoolYear").value;
+function updateEnrollee() {
+    // Ensure the currentEditIndex is valid
+    if (currentEditIndex >= 0 && currentEditIndex < enrollees.length) {
+        // Get the updated values from the input fields
+        const firstNameInput = document.getElementById("firstName").value;
+        const middleNameInput = document.getElementById("middleName").value;
+        const lastNameInput = document.getElementById("lastName").value;
+        const ageInput = document.getElementById("age").value;
+        const genderInput = document.getElementById("gender").value;
+        const birthdayInput = document.getElementById("birthday").value;
+        const courseInput = document.getElementById("course").value;
+        const schoolYearInput = document.getElementById("schoolYear").value;
 
-    // Update the selected enrollee with the new values
-    enrollees[index].firstName = firstNameInput;
-    enrollees[index].middleName = middleNameInput;
-    enrollees[index].lastName = lastNameInput;
-    enrollees[index].age = ageInput;
-    enrollees[index].gender = genderInput;
-    enrollees[index].birthday = birthdayInput;
-    enrollees[index].course = courseInput;
-    enrollees[index].schoolYear = schoolYearInput;
+        // Update the selected enrollee with the new values
+        enrollees[currentEditIndex].firstName = firstNameInput;
+        enrollees[currentEditIndex].middleName = middleNameInput;
+        enrollees[currentEditIndex].lastName = lastNameInput;
+        enrollees[currentEditIndex].age = ageInput;
+        enrollees[currentEditIndex].gender = genderInput;
+        enrollees[currentEditIndex].birthday = birthdayInput;
+        enrollees[currentEditIndex].course = courseInput;
+        enrollees[currentEditIndex].schoolYear = schoolYearInput;
 
-    // Reset the form and display the updated enrollees
-    const addButton = document.querySelector(".submit-btn");
-    addButton.textContent = "Submit";
-    addButton.addEventListener("click", addEnrollee); // Restore the original event listener
-    form.reset();
-    displayEnrollees();
+        // Reset the form and display the updated enrollees
+        const submitButton = document.querySelector(".submit-btn");
+        submitButton.textContent = "Submit";
+        submitButton.addEventListener("click", addEnrollee);
+        form.reset();
+        displayEnrollees();
+
+        // Reset the currentEditIndex to -1 after successful update
+        currentEditIndex = -1;
+    }
 }
+
 
 // Function to delete an enrollee
 function deleteEnrollee(enrollee) {
